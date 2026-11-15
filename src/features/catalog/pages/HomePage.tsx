@@ -99,15 +99,17 @@ export function HomePage() {
 
           {spotlight ? (
             <Link
-              to={`/catalog?brand=${encodeURIComponent(spotlight.brand)}`}
-              className="group relative hidden overflow-hidden rounded-card border border-white/15 bg-ink/40 shadow-2xl shadow-black/40 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-glow lg:block"
+              to={`/catalog/${spotlight.id}`}
+              className="group hidden overflow-hidden rounded-card border border-white/15 bg-panel shadow-[0_18px_40px_rgba(0,0,0,0.28)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-glow lg:block"
             >
-              <img
-                src={spotlight.image}
-                alt={`${spotlight.brand} ${spotlight.model}`}
-                className="aspect-[16/11] w-full object-cover transition duration-500 group-hover:scale-105"
-              />
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-canvas via-canvas/80 to-transparent p-5 pt-16">
+              <div className="overflow-hidden">
+                <img
+                  src={spotlight.image}
+                  alt={`${spotlight.brand} ${spotlight.model}`}
+                  className="aspect-[16/11] w-full object-cover transition duration-500 group-hover:scale-[1.03] motion-reduce:transform-none"
+                />
+              </div>
+              <div className="border-t border-white/10 p-5">
                 <p className="text-xs font-bold uppercase tracking-[0.16em] text-glow">Пропозиція на головній</p>
                 <p className="mt-1 text-2xl font-extrabold">
                   {spotlight.brand} {spotlight.model}
@@ -234,13 +236,13 @@ export function HomePage() {
                 isFavorite={isFavorite(vehicle.id)}
                 onToggleFavorite={toggleFavorite}
                 action={
-                  <Link
-                    to="/catalog"
-                    className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-control bg-white text-sm font-bold text-ink transition hover:bg-glow focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-glow"
-                  >
-                    Переглянути в каталозі
-                    <ArrowRight size={16} />
-                  </Link>
+                <Link
+                  to={`/catalog/${vehicle.id}`}
+                  className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-control bg-white text-sm font-bold text-ink transition hover:bg-glow focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-glow"
+                >
+                  Детальніше
+                  <ArrowRight size={16} />
+                </Link>
                 }
               />
             ))}

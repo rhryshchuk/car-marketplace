@@ -1,10 +1,9 @@
-import { type ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { ArrowLeft, Fuel, Gauge, Heart } from 'lucide-react'
-import type { Vehicle } from '@/data/vehicles'
 import { useFavorites } from '@/features/favorites'
-import { getVehicleById, vehicleQueryKey } from '@/services/vehicleService'
+import { getVehicleById, vehicleQueryKey, type VehicleView } from '@/services/vehicleService'
 import { formatMileage, formatPrice } from '@/shared/lib/format'
 import { Container } from '@/shared/ui/Container'
 
@@ -89,7 +88,13 @@ function Status({
   )
 }
 
-function VehicleDetails({ vehicle }: { vehicle: Vehicle }) {
+const statusLabels: Record<NonNullable<VehicleView['status']>, string> = {
+  available: 'В наявності',
+  expected: 'Очікується',
+  sold: 'Продано',
+}
+
+function VehicleDetails({ vehicle }: { vehicle: VehicleView }) {
   const { isFavorite, toggleFavorite } = useFavorites()
   const saved = isFavorite(vehicle.id)
   const description = `${vehicle.brand} ${vehicle.model}, ${vehicle.year} рік. ${vehicle.bodyType}, паливо: ${vehicle.fuel.toLowerCase()}, пробіг ${formatMileage(vehicle.mileage)}.`
@@ -111,15 +116,7 @@ function VehicleDetails({ vehicle }: { vehicle: Vehicle }) {
       </div>
 
       <div className="grid items-start gap-8 lg:grid-cols-[1.15fr_0.85fr]">
-        <div>
-          <div className="overflow-hidden rounded-card border border-white/10 bg-ink">
-            <img
-              src={vehicle.image}
-              alt={`${vehicle.brand} ${vehicle.model}`}
-              className="aspect-[16/10] w-full object-cover"
-            />
-          </div>
-        </div>
+        <Gallery name={`${vehicle.brand} ${vehicle.model}`} photos={vehicle.photos} />
 
         <div className="rounded-card border border-white/10 bg-panel p-5 sm:p-7">
           <p className="text-xs font-bold uppercase tracking-[0.16em] text-glow">{vehicle.brand}</p>
@@ -132,6 +129,7 @@ function VehicleDetails({ vehicle }: { vehicle: Vehicle }) {
             <Spec label="Модель" value={vehicle.model} />
             <Spec label="Рік" value={String(vehicle.year)} />
             <Spec label="Кузов" value={vehicle.bodyType} />
+            {vehicle.status ? <Spec label="Статус" value={statusLabels[vehicle.status]} /> : null}
             <Spec
               label="Пробіг"
               value={
@@ -201,6 +199,46 @@ function VehicleDetails({ vehicle }: { vehicle: Vehicle }) {
         </Link>
       </section>
     </Container>
+  )
+}
+
+function Gallery({ name, photos }: { name: string; photos: string[] }) {
+  const [active, setActive] = useState(0)
+  const safeIndex = active < photos.length ? active : 0
+  const current = photos[safeIndex]
+
+  if (!current) return null
+
+  return (
+    <div>
+      <div className="overflow-hidden rounded-card border border-white/10 bg-ink">
+        <img
+          key={current}
+          src={current}
+          alt={name}
+          className="aspect-[16/10] w-full object-cover motion-safe:animate-[photo-in_280ms_ease]"
+        />
+      </div>
+      {photos.length > 1 ? (
+        <ul className="mt-3 grid grid-cols-4 gap-2 sm:grid-cols-5">
+          {photos.map((photo, index) => (
+            <li key={`${photo}-${index}`}>
+              <button
+                type="button"
+                onClick={() => setActive(index)}
+                aria-label={`Фото ${index + 1}`}
+                aria-pressed={index === safeIndex}
+                className={`overflow-hidden rounded-control border transition ${
+                  index === safeIndex ? 'border-accent' : 'border-white/10 hover:border-white/30'
+                }`}
+              >
+                <img src={photo} alt="" className="aspect-[16/10] w-full object-cover" />
+              </button>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+    </div>
   )
 }
 

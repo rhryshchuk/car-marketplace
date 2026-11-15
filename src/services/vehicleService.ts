@@ -3,6 +3,13 @@ import { supabase } from '@/lib/supabase'
 
 const publicStatuses = ['available', 'expected', 'sold'] as const
 
+export type PublicStatus = (typeof publicStatuses)[number]
+
+export type VehicleView = Vehicle & {
+  status: PublicStatus | null
+  photos: string[]
+}
+
 const vehicleColumns =
   'id, brand, model, year, price, mileage, fuel, body_type, image, vehicle_photos(url, storage_path, sort_order)'
 
@@ -98,6 +105,38 @@ async function mainImage(image: string, photos: PhotoRow[]) {
   return data.signedUrl
 }
 
+function isPublicStatus(value: string): value is PublicStatus {
+  return publicStatuses.some((status) => status === value)
+}
+
+async function photoUrls(photos: PhotoRow[], fallback: string) {
+  const sorted = [...photos].sort((left, right) => left.sortOrder - right.sortOrder)
+  const stored = sorted.filter((photo) => !isHttpUrl(photo.url))
+  const signed = new Map<string, string>()
+
+  if (stored.length > 0) {
+    const { data } = await supabase.storage
+      .from('vehicle-photos')
+      .createSignedUrls(
+        stored.map((photo) => photo.storagePath),
+        60 * 60,
+      )
+
+    for (const item of data ?? []) {
+      if (item.path && item.signedUrl && !item.error) signed.set(item.path, item.signedUrl)
+    }
+  }
+
+  const urls = sorted.flatMap((photo) => {
+    if (isHttpUrl(photo.url)) return [photo.url]
+    const url = signed.get(photo.storagePath)
+    return url ? [url] : []
+  })
+
+  if (urls.length > 0) return urls
+  return fallback ? [fallback] : []
+}
+
 async function toVehicle(value: unknown): Promise<Vehicle> {
   const fields = readVehicleFields(value)
 
@@ -129,17 +168,26 @@ export async function getVehicles(): Promise<Vehicle[]> {
   return Promise.all((data ?? []).map((row) => toVehicle(row)))
 }
 
-export async function getVehicleById(id: number): Promise<Vehicle | null> {
+export async function getVehicleById(id: number): Promise<VehicleView | null> {
   if (!Number.isInteger(id)) return null
 
   const { data, error } = await supabase
     .from('vehicles')
-    .select(vehicleColumns)
+    .select(`${vehicleColumns}, status`)
     .eq('id', id)
     .in('status', [...publicStatuses])
     .maybeSingle()
 
   if (error) throw queryError()
   if (!data) return null
-  return toVehicle(data)
+
+  const vehicle = await toVehicle(data)
+  const fields = readVehicleFields(data)
+  const status = isRecord(data) && typeof data.status === 'string' && isPublicStatus(data.status) ? data.status : null
+
+  return {
+    ...vehicle,
+    status,
+    photos: await photoUrls(fields.photos, vehicle.image),
+  }
 }

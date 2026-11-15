@@ -100,7 +100,7 @@ export function AppShell() {
         ) : null}
       </header>
 
-      <main id="content" className="flex-1">
+      <main id="content" key={location.pathname} className="page-enter flex-1">
         <Outlet />
       </main>
 
