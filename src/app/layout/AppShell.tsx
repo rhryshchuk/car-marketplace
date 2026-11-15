@@ -39,7 +39,7 @@ export function AppShell() {
             </span>
           </Link>
 
-          <nav className="hidden items-center gap-8 md:flex" aria-label="Головне">
+          <nav className="hidden items-center gap-8 lg:flex" aria-label="Головне">
             <NavLink to="/" end className={navLinkClass}>
               Головна
             </NavLink>
@@ -49,9 +49,12 @@ export function AppShell() {
             <NavLink to="/favorites" className={navLinkClass}>
               Обране
             </NavLink>
-            <Link to="/#about" className="text-sm font-semibold text-mist transition hover:text-white">
-              Про нас
-            </Link>
+            <NavLink to="/contacts" className={navLinkClass}>
+              Контакти
+            </NavLink>
+            <NavLink to="/about" className={navLinkClass}>
+              Про компанію
+            </NavLink>
           </nav>
 
           <div className="flex items-center gap-2">
@@ -63,7 +66,7 @@ export function AppShell() {
             </Link>
             <button
               type="button"
-              className="inline-flex size-11 items-center justify-center rounded-control border border-white/15 text-white md:hidden"
+              className="inline-flex size-11 items-center justify-center rounded-control border border-white/15 text-white lg:hidden"
               aria-expanded={menuOpen}
               aria-controls="mobile-nav"
               onClick={() => setMenuLocation(menuOpen ? null : here)}
@@ -75,7 +78,7 @@ export function AppShell() {
         </Container>
 
         {menuOpen ? (
-          <nav id="mobile-nav" className="border-t border-white/10 bg-ink md:hidden" aria-label="Мобільне">
+          <nav id="mobile-nav" className="border-t border-white/10 bg-ink lg:hidden" aria-label="Мобільне">
             <Container className="flex flex-col gap-1 py-3">
               <NavLink to="/" end onClick={closeMenu} className="rounded-control px-3 py-3 text-base font-semibold hover:bg-white/5">
                 Головна
@@ -86,9 +89,12 @@ export function AppShell() {
               <NavLink to="/favorites" onClick={closeMenu} className="rounded-control px-3 py-3 text-base font-semibold hover:bg-white/5">
                 Обране
               </NavLink>
-              <Link to="/#about" onClick={closeMenu} className="rounded-control px-3 py-3 text-base font-semibold text-mist hover:bg-white/5 hover:text-white">
-                Про нас
-              </Link>
+              <NavLink to="/contacts" onClick={closeMenu} className="rounded-control px-3 py-3 text-base font-semibold hover:bg-white/5">
+                Контакти
+              </NavLink>
+              <NavLink to="/about" onClick={closeMenu} className="rounded-control px-3 py-3 text-base font-semibold hover:bg-white/5">
+                Про компанію
+              </NavLink>
             </Container>
           </nav>
         ) : null}
@@ -118,8 +124,11 @@ export function AppShell() {
             <Link to="/favorites" className="hover:text-white">
               Обране
             </Link>
-            <Link to="/#about" className="hover:text-white">
-              Про нас
+            <Link to="/contacts" className="hover:text-white">
+              Контакти
+            </Link>
+            <Link to="/about" className="hover:text-white">
+              Про компанію
             </Link>
           </nav>
           <p className="text-sm text-mist">© {new Date().getFullYear()} AUTO MARKET. Усі права захищені.</p>

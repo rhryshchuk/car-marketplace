@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
 import {
   ArrowDownUp,
   ArrowRight,
@@ -7,8 +8,8 @@ import {
   SlidersHorizontal,
   X,
 } from 'lucide-react'
-import { vehicles } from '@/data/vehicles'
 import { useFavorites } from '@/features/favorites'
+import { getVehicles, vehiclesQueryKey } from '@/services/vehicleService'
 import { Container } from '@/shared/ui/Container'
 import { VehicleCard } from '@/shared/ui/VehicleCard'
 
@@ -24,11 +25,17 @@ export function CatalogPage() {
   const [maxPrice, setMaxPrice] = useState(searchParams.get('maxPrice') ?? 'Усі ціни')
   const [sort, setSort] = useState('newest')
   const { isFavorite, toggleFavorite } = useFavorites()
+  const vehiclesQuery = useQuery({
+    queryKey: vehiclesQueryKey,
+    queryFn: getVehicles,
+  })
+  const vehicles = vehiclesQuery.data ?? []
 
   const filteredVehicles = useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase()
+    const source = vehiclesQuery.data ?? []
 
-    const result = vehicles.filter((vehicle) => {
+    const result = source.filter((vehicle) => {
       const searchableName = `${vehicle.brand} ${vehicle.model}`.toLowerCase()
 
       const matchesSearch = searchableName.includes(normalizedSearch)
@@ -54,7 +61,7 @@ export function CatalogPage() {
     }
 
     return result
-  }, [search, brand, bodyType, maxPrice, sort])
+  }, [vehiclesQuery.data, search, brand, bodyType, maxPrice, sort])
 
   const resetFilters = () => {
     setSearch('')
@@ -209,14 +216,48 @@ export function CatalogPage() {
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.16em] text-glow">Наші пропозиції</p>
             <h2 className="mt-2 text-2xl font-extrabold sm:text-3xl">Доступні автомобілі</h2>
-            <p className="mt-2 text-sm text-mist">Знайдено пропозицій: {filteredVehicles.length}</p>
+            <p className="mt-2 text-sm text-mist">
+              {vehiclesQuery.isPending
+                ? 'Завантаження…'
+                : vehiclesQuery.isError
+                  ? 'Каталог недоступний'
+                  : `Знайдено пропозицій: ${filteredVehicles.length}`}
+            </p>
           </div>
           <span className="rounded-control border border-white/10 bg-panel px-4 py-2.5 text-sm font-bold text-glow">
-            {filteredVehicles.length} авто
+            {vehiclesQuery.isSuccess ? `${filteredVehicles.length} авто` : '…'}
           </span>
         </div>
 
-        {filteredVehicles.length > 0 ? (
+        {vehiclesQuery.isPending ? (
+          <div className="rounded-card border border-white/10 bg-panel px-6 py-16 text-center">
+            <h3 className="text-xl font-bold">Завантаження автомобілів…</h3>
+            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-mist">
+              Каталог оновлюється з бази компанії.
+            </p>
+          </div>
+        ) : vehiclesQuery.isError ? (
+          <div className="rounded-card border border-white/10 bg-panel px-6 py-16 text-center">
+            <h3 className="text-xl font-bold">Не вдалося завантажити каталог</h3>
+            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-mist">
+              {vehiclesQuery.error.message}
+            </p>
+            <button
+              type="button"
+              onClick={() => void vehiclesQuery.refetch()}
+              className="mt-6 inline-flex h-12 items-center rounded-control bg-accent px-6 text-sm font-bold text-white transition hover:bg-accent-strong"
+            >
+              Спробувати ще
+            </button>
+          </div>
+        ) : vehicles.length === 0 ? (
+          <div className="rounded-card border border-white/10 bg-panel px-6 py-16 text-center">
+            <h3 className="text-xl font-bold">У каталозі поки немає автомобілів</h3>
+            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-mist">
+              Нові пропозиції компанії з’являться тут, щойно їх додадуть.
+            </p>
+          </div>
+        ) : filteredVehicles.length > 0 ? (
           <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
             {filteredVehicles.map((vehicle) => (
               <VehicleCard
@@ -225,13 +266,13 @@ export function CatalogPage() {
                 isFavorite={isFavorite(vehicle.id)}
                 onToggleFavorite={toggleFavorite}
                 action={
-                  <button
-                    type="button"
+                  <Link
+                    to={`/catalog/${vehicle.id}`}
                     className="inline-flex h-11 items-center gap-2 rounded-control bg-accent/15 px-4 text-sm font-bold text-glow transition hover:bg-accent hover:text-white"
                   >
                     Детальніше
                     <ArrowRight size={16} />
-                  </button>
+                  </Link>
                 }
               />
             ))}

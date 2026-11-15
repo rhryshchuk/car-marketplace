@@ -1,14 +1,19 @@
 import { Link } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
 import { ArrowRight, Heart } from 'lucide-react'
-import { vehicles } from '@/data/vehicles'
 import { favoriteVehicles } from '@/features/favorites/model/favorites'
 import { useFavorites } from '@/features/favorites/hooks/useFavorites'
+import { getVehicles, vehiclesQueryKey } from '@/services/vehicleService'
 import { Container } from '@/shared/ui/Container'
 import { VehicleCard } from '@/shared/ui/VehicleCard'
 
 export function FavoritesPage() {
   const { favoriteIds, isFavorite, toggleFavorite } = useFavorites()
-  const saved = favoriteVehicles(vehicles, favoriteIds)
+  const vehiclesQuery = useQuery({
+    queryKey: vehiclesQueryKey,
+    queryFn: getVehicles,
+  })
+  const saved = vehiclesQuery.data ? favoriteVehicles(vehiclesQuery.data, favoriteIds) : []
 
   return (
     <Container className="py-10 sm:py-12">
@@ -27,7 +32,23 @@ export function FavoritesPage() {
         </p>
       </section>
 
-      {saved.length > 0 ? (
+      {vehiclesQuery.isPending ? (
+        <div className="rounded-card border border-white/10 bg-panel px-6 py-16 text-center">
+          <h2 className="text-xl font-bold">Завантаження обраного…</h2>
+        </div>
+      ) : vehiclesQuery.isError ? (
+        <div className="rounded-card border border-white/10 bg-panel px-6 py-16 text-center">
+          <h2 className="text-xl font-bold">Не вдалося завантажити обране</h2>
+          <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-mist">{vehiclesQuery.error.message}</p>
+          <button
+            type="button"
+            onClick={() => void vehiclesQuery.refetch()}
+            className="mt-6 inline-flex h-12 items-center rounded-control bg-accent px-6 text-sm font-bold text-white transition hover:bg-accent-strong"
+          >
+            Спробувати ще
+          </button>
+        </div>
+      ) : saved.length > 0 ? (
         <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
           {saved.map((vehicle) => (
             <VehicleCard

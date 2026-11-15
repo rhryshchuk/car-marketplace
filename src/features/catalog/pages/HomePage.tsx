@@ -1,8 +1,9 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
 import { ArrowRight, CarFront, Search, ShieldCheck, SlidersHorizontal } from 'lucide-react'
-import { vehicles } from '@/data/vehicles'
 import { useFavorites } from '@/features/favorites'
+import { getVehicles, vehiclesQueryKey } from '@/services/vehicleService'
 import { VehicleCard } from '@/shared/ui/VehicleCard'
 import { formatPrice } from '@/shared/lib/format'
 import { Container } from '@/shared/ui/Container'
@@ -34,10 +35,15 @@ export function HomePage() {
   const [brand, setBrand] = useState('')
   const [bodyType, setBodyType] = useState('')
   const [maxPrice, setMaxPrice] = useState('')
+  const vehiclesQuery = useQuery({
+    queryKey: vehiclesQueryKey,
+    queryFn: getVehicles,
+  })
+  const vehicles = vehiclesQuery.data ?? []
 
   const spotlight = vehicles[0]
   const brands = [...new Set(vehicles.map((vehicle) => vehicle.brand))]
-  const lowestPrice = Math.min(...vehicles.map((vehicle) => vehicle.price))
+  const lowestPrice = vehicles.length > 0 ? Math.min(...vehicles.map((vehicle) => vehicle.price)) : null
 
   const handleSearch = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -196,25 +202,50 @@ export function HomePage() {
             <ArrowRight size={16} />
           </Link>
         </div>
-        <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-          {vehicles.map((vehicle) => (
-            <VehicleCard
-              key={vehicle.id}
-              vehicle={vehicle}
-              isFavorite={isFavorite(vehicle.id)}
-              onToggleFavorite={toggleFavorite}
-              action={
-                <Link
-                  to="/catalog"
-                  className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-control bg-white text-sm font-bold text-ink transition hover:bg-glow focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-glow"
-                >
-                  Переглянути в каталозі
-                  <ArrowRight size={16} />
-                </Link>
-              }
-            />
-          ))}
-        </div>
+        {vehiclesQuery.isPending ? (
+          <div className="rounded-card border border-white/10 bg-panel px-6 py-16 text-center">
+            <h3 className="text-xl font-bold">Завантаження автомобілів…</h3>
+          </div>
+        ) : vehiclesQuery.isError ? (
+          <div className="rounded-card border border-white/10 bg-panel px-6 py-16 text-center">
+            <h3 className="text-xl font-bold">Не вдалося завантажити автомобілі</h3>
+            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-mist">{vehiclesQuery.error.message}</p>
+            <button
+              type="button"
+              onClick={() => void vehiclesQuery.refetch()}
+              className="mt-6 inline-flex h-12 items-center rounded-control bg-accent px-6 text-sm font-bold text-white transition hover:bg-accent-strong"
+            >
+              Спробувати ще
+            </button>
+          </div>
+        ) : vehicles.length === 0 ? (
+          <div className="rounded-card border border-white/10 bg-panel px-6 py-16 text-center">
+            <h3 className="text-xl font-bold">У каталозі поки немає автомобілів</h3>
+            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-mist">
+              Рекомендовані пропозиції з’являться тут після додавання авто.
+            </p>
+          </div>
+        ) : (
+          <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+            {vehicles.map((vehicle) => (
+              <VehicleCard
+                key={vehicle.id}
+                vehicle={vehicle}
+                isFavorite={isFavorite(vehicle.id)}
+                onToggleFavorite={toggleFavorite}
+                action={
+                  <Link
+                    to="/catalog"
+                    className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-control bg-white text-sm font-bold text-ink transition hover:bg-glow focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-glow"
+                  >
+                    Переглянути в каталозі
+                    <ArrowRight size={16} />
+                  </Link>
+                }
+              />
+            ))}
+          </div>
+        )}
       </Container>
 
       <Container className="pb-16">
@@ -237,9 +268,15 @@ export function HomePage() {
               </Link>
             </div>
             <div className="grid grid-cols-3 border-t border-white/10 lg:border-t-0 lg:border-l">
-              <Stat value={String(vehicles.length)} label="авто в каталозі" />
-              <Stat value={String(brands.length)} label="марок" />
-              <Stat value={formatPrice(lowestPrice)} label="найнижча ціна" />
+              <Stat
+                value={vehiclesQuery.isSuccess ? String(vehicles.length) : '…'}
+                label="авто в каталозі"
+              />
+              <Stat value={vehiclesQuery.isSuccess ? String(brands.length) : '…'} label="марок" />
+              <Stat
+                value={lowestPrice === null ? '—' : formatPrice(lowestPrice)}
+                label="найнижча ціна"
+              />
             </div>
           </div>
         </section>
@@ -252,18 +289,24 @@ export function HomePage() {
             Усі авто
           </Link>
         </div>
-        <ul className="flex flex-wrap gap-3">
-          {brands.map((item) => (
-            <li key={item}>
-              <Link
-                to={`/catalog?brand=${encodeURIComponent(item)}`}
-                className="inline-flex h-12 items-center rounded-full border border-white/10 bg-panel px-5 text-sm font-bold transition hover:border-accent/50 hover:text-glow"
-              >
-                {item}
-              </Link>
-            </li>
-          ))}
-        </ul>
+        {vehiclesQuery.isError ? (
+          <p className="text-sm text-mist">Марки з’являться, коли каталог завантажиться.</p>
+        ) : vehiclesQuery.isSuccess && brands.length === 0 ? (
+          <p className="text-sm text-mist">У каталозі поки немає марок.</p>
+        ) : (
+          <ul className="flex flex-wrap gap-3">
+            {brands.map((item) => (
+              <li key={item}>
+                <Link
+                  to={`/catalog?brand=${encodeURIComponent(item)}`}
+                  className="inline-flex h-12 items-center rounded-full border border-white/10 bg-panel px-5 text-sm font-bold transition hover:border-accent/50 hover:text-glow"
+                >
+                  {item}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
       </Container>
     </div>
   )
