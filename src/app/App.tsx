@@ -1,8 +1,7 @@
-
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { CatalogPage } from '@/features/catalog/pages/CatalogPage'
-import HomePage from '@/features/catalog/pages/HomePage'
+import { AppShell } from '@/app/layout/AppShell'
+import { CatalogPage, HomePage } from '@/features/catalog'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -18,8 +17,10 @@ export function App() {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/catalog" element={<CatalogPage />} />
+          <Route element={<AppShell />}>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/catalog" element={<CatalogPage />} />
+          </Route>
         </Routes>
       </BrowserRouter>
     </QueryClientProvider>
