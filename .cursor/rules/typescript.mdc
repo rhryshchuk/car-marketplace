@@ -1,0 +1,24 @@
+---
+description: Strict TypeScript for domain entities, API contracts, and error handling
+globs: src/**/*.ts, src/**/*.tsx
+alwaysApply: false
+---
+
+# TypeScript
+
+- Keep `strict` enabled. Do not use `any`. Use `unknown` and narrow it before use.
+- Avoid `as`. A local assertion is allowed only at a validated boundary, with a short comment saying what was checked.
+- Define domain entities explicitly (`Listing`, `Vehicle`, `Money`, `Dealer`). Do not pass raw API payloads into components.
+- Type each API request and response. Map those DTOs to domain types inside the service layer.
+- Represent finite states as discriminated unions, such as `{ status: "idle" } | { status: "error"; error: AppError }`.
+- Throw a typed error or return a typed result. Catch where the caller can show a message or retry. Empty `catch` blocks are not allowed.
+- Type function inputs and public return values. Let inference cover obvious locals.
+
+```ts
+type ListingResponse = { id: string; price_cents: number; currency: string };
+type Listing = { id: string; price: Money };
+
+function toListing(dto: ListingResponse): Listing {
+  return { id: dto.id, price: { cents: dto.price_cents, currency: dto.currency } };
+}
+```

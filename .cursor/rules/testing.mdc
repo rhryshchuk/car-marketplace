@@ -1,0 +1,15 @@
+---
+description: Unit, integration, and component testing, including critical marketplace journeys
+globs: src/**/*.test.ts, src/**/*.test.tsx, src/**/*.spec.ts, src/**/*.spec.tsx
+alwaysApply: false
+---
+
+# Testing
+
+- Test observable behavior. Assert what the caller or user sees, not private state or component internals.
+- Colocate tests with the unit under test: `ListingCard.test.tsx` beside `ListingCard.tsx`.
+- Unit-test pure domain rules and mappers with direct inputs and outputs. No DOM and no network.
+- Component-test with React Testing Library. Query by role, label, or text. Drive the UI with clicks and typing.
+- Integration-test a feature from its public boundary. Mock the network, not internal hooks.
+- Cover these journeys: search and filter listings, open a listing, and start a contact or offer. Each journey needs the success path and one failure (empty results, network error, or validation error).
+- Do not snapshot full pages. A snapshot is acceptable only for a small, stable presentational fragment.

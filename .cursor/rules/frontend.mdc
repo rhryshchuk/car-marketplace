@@ -1,0 +1,29 @@
+---
+description: Feature-based frontend layout and separation of UI, hooks, services, and business logic
+globs: src/**/*.ts, src/**/*.tsx
+alwaysApply: false
+---
+
+# Frontend architecture
+
+Organize by feature. Keep technical folders inside the feature that owns them.
+
+```text
+src/
+  app/                      router, providers, app shell
+  features/<feature>/
+    components/
+    hooks/
+    services/
+    model/                  types and pure business rules
+    index.ts                public exports only
+  shared/
+    ui/                     components used by more than one feature
+    lib/                    pure helpers with no feature knowledge
+```
+
+- Components render. Hooks own state and effects. Services perform I/O. `model/` holds rules that stay valid without React.
+- Pages compose features. They do not encode pricing, eligibility, or listing rules.
+- A feature may import `shared/` and its own files. It must not import another feature's internals. Cross-feature use goes through that feature's `index.ts`.
+- Move a component to `shared/ui` only after a second feature needs it.
+- Keep route modules thin: load data, call a feature hook or service, then render.

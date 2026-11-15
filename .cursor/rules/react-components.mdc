@@ -1,0 +1,21 @@
+---
+description: React component patterns for composition, hooks, and render performance
+globs: src/**/*.tsx
+alwaysApply: false
+---
+
+# React components
+
+- Use function components and hooks. Type props with an explicit interface. Prefer named exports.
+- Compose with `children` and small components. Do not grow boolean prop sets (`isPrimary`, `isCompact`, `hasIcon`) when a new component would be clearer.
+- Compute derived values during render. Use `useEffect` to synchronize with an external system, not to copy props into state.
+- Extract a custom hook when logic is reused or it obscures the render. Keep the hook in the feature that owns it.
+- Use stable domain ids as list keys.
+- Add `memo`, `useMemo`, or `useCallback` only after a render cost shows up. Do not memoize by default.
+- Do not wrap a single call site in a new component or hook for hypothetical reuse.
+
+```tsx
+const priceLabel = formatPrice(listing.price);
+
+useEffect(() => subscribeToListing(listing.id), [listing.id]);
+```

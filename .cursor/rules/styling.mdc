@@ -1,0 +1,16 @@
+---
+description: Tailwind CSS conventions for responsive layout, consistency, accessibility, and design tokens
+globs: src/**/*.tsx, src/**/*.css, tailwind.config.*
+alwaysApply: false
+---
+
+# Styling
+
+- Style with Tailwind utilities on the element. Extract a component when the same class group repeats. Do not add one-off `@apply` bundles.
+- Use theme tokens for spacing, color, type, and radius. Arbitrary values (`w-[137px]`, `text-[#123456]`, `p-[13px]`) are only for a fixed asset size that no token matches.
+- Design mobile-first: base classes for the small screen, then `sm:`, `md:`, and `lg:` overrides.
+- Keep one spacing scale, one focus ring, and consistent control heights across features.
+- Use semantic elements (`button`, `nav`, `label`, headings in order). Every control needs an accessible name.
+- Keep a visible `:focus-visible` style. Do not remove an outline without a replacement.
+- Keep touch targets at least 44px. Text must meet contrast against its background.
+- Prefer `gap` and layout utilities over stacked margins between siblings.

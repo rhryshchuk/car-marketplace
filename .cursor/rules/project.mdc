@@ -1,0 +1,20 @@
+---
+description: Engineering principles for clean architecture, separation of concerns, and maintainable scale
+alwaysApply: true
+---
+
+# Engineering principles
+
+- Keep domain rules independent of React, HTTP, and storage. UI and services depend on the domain; the domain does not depend on them.
+- Give each module one reason to change. Do not mix rendering, data access, and business rules in the same file.
+- Expose a small public API per feature. Callers import that API, not internal files.
+- Use the simplest design that meets the current requirement. Add a layer, generic, or library only when a second concrete use case needs it.
+- Name types and functions with marketplace language (`Listing`, `Offer`, `Dealer`), not framework language.
+- Handle failure at the boundary that can show a message, retry, or abort. Do not swallow errors.
+- Leave generated output, lockfiles, and unrelated config untouched when the task does not require them.
+
+```text
+features/<feature>/model   domain rules, no framework imports
+features/<feature>/services I/O and mapping at the edge
+app + components            composition and rendering
+```
