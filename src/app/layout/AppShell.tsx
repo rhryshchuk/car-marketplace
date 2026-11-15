@@ -46,6 +46,9 @@ export function AppShell() {
             <NavLink to="/catalog" className={navLinkClass}>
               Каталог
             </NavLink>
+            <NavLink to="/favorites" className={navLinkClass}>
+              Обране
+            </NavLink>
             <Link to="/#about" className="text-sm font-semibold text-mist transition hover:text-white">
               Про нас
             </Link>
@@ -80,6 +83,9 @@ export function AppShell() {
               <NavLink to="/catalog" onClick={closeMenu} className="rounded-control px-3 py-3 text-base font-semibold hover:bg-white/5">
                 Каталог
               </NavLink>
+              <NavLink to="/favorites" onClick={closeMenu} className="rounded-control px-3 py-3 text-base font-semibold hover:bg-white/5">
+                Обране
+              </NavLink>
               <Link to="/#about" onClick={closeMenu} className="rounded-control px-3 py-3 text-base font-semibold text-mist hover:bg-white/5 hover:text-white">
                 Про нас
               </Link>
@@ -108,6 +114,9 @@ export function AppShell() {
             </Link>
             <Link to="/catalog" className="hover:text-white">
               Каталог
+            </Link>
+            <Link to="/favorites" className="hover:text-white">
+              Обране
             </Link>
             <Link to="/#about" className="hover:text-white">
               Про нас

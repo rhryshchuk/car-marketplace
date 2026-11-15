@@ -2,7 +2,8 @@ import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { ArrowRight, CarFront, Search, ShieldCheck, SlidersHorizontal } from 'lucide-react'
 import { vehicles } from '@/data/vehicles'
-import { VehicleCard } from '@/features/catalog/components/VehicleCard'
+import { useFavorites } from '@/features/favorites'
+import { VehicleCard } from '@/shared/ui/VehicleCard'
 import { formatPrice } from '@/shared/lib/format'
 import { Container } from '@/shared/ui/Container'
 
@@ -29,7 +30,7 @@ const benefits = [
 
 export function HomePage() {
   const navigate = useNavigate()
-  const [favorites, setFavorites] = useState<number[]>([])
+  const { isFavorite, toggleFavorite } = useFavorites()
   const [brand, setBrand] = useState('')
   const [bodyType, setBodyType] = useState('')
   const [maxPrice, setMaxPrice] = useState('')
@@ -37,12 +38,6 @@ export function HomePage() {
   const spotlight = vehicles[0]
   const brands = [...new Set(vehicles.map((vehicle) => vehicle.brand))]
   const lowestPrice = Math.min(...vehicles.map((vehicle) => vehicle.price))
-
-  const toggleFavorite = (id: number) => {
-    setFavorites((current) =>
-      current.includes(id) ? current.filter((item) => item !== id) : [...current, id],
-    )
-  }
 
   const handleSearch = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -206,7 +201,7 @@ export function HomePage() {
             <VehicleCard
               key={vehicle.id}
               vehicle={vehicle}
-              isFavorite={favorites.includes(vehicle.id)}
+              isFavorite={isFavorite(vehicle.id)}
               onToggleFavorite={toggleFavorite}
               action={
                 <Link

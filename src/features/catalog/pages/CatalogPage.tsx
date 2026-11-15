@@ -8,8 +8,9 @@ import {
   X,
 } from 'lucide-react'
 import { vehicles } from '@/data/vehicles'
-import { VehicleCard } from '@/features/catalog/components/VehicleCard'
+import { useFavorites } from '@/features/favorites'
 import { Container } from '@/shared/ui/Container'
+import { VehicleCard } from '@/shared/ui/VehicleCard'
 
 const selectClass =
   'h-12 w-full rounded-control border border-white/10 bg-ink px-4 text-sm text-white outline-none transition hover:border-white/20 focus-visible:border-accent focus-visible:ring-4 focus-visible:ring-accent/20'
@@ -22,7 +23,7 @@ export function CatalogPage() {
   const [bodyType, setBodyType] = useState(searchParams.get('bodyType') ?? 'Усі типи')
   const [maxPrice, setMaxPrice] = useState(searchParams.get('maxPrice') ?? 'Усі ціни')
   const [sort, setSort] = useState('newest')
-  const [favorites, setFavorites] = useState<number[]>([])
+  const { isFavorite, toggleFavorite } = useFavorites()
 
   const filteredVehicles = useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase()
@@ -61,14 +62,6 @@ export function CatalogPage() {
     setBodyType('Усі типи')
     setMaxPrice('Усі ціни')
     setSort('newest')
-  }
-
-  const toggleFavorite = (id: number) => {
-    setFavorites((current) =>
-      current.includes(id)
-        ? current.filter((favoriteId) => favoriteId !== id)
-        : [...current, id],
-    )
   }
 
   const hasActiveFilters =
@@ -229,7 +222,7 @@ export function CatalogPage() {
               <VehicleCard
                 key={vehicle.id}
                 vehicle={vehicle}
-                isFavorite={favorites.includes(vehicle.id)}
+                isFavorite={isFavorite(vehicle.id)}
                 onToggleFavorite={toggleFavorite}
                 action={
                   <button
