@@ -247,6 +247,9 @@ function Gallery({ name, photos }: { name: string; photos: string[] }) {
             >
               <ChevronRight size={22} />
             </button>
+            <p className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-ink/75 px-3 py-1 text-xs font-semibold text-white backdrop-blur">
+              {safeIndex + 1} / {photos.length}
+            </p>
           </>
         ) : null}
       </div>

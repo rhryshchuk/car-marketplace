@@ -103,15 +103,9 @@ export function CatalogPage() {
               Обирай серед актуальних пропозицій та знаходь автомобіль, який відповідає твоїм потребам.
             </p>
           </div>
-          <div className="flex w-fit items-center gap-3 rounded-card border border-white/10 bg-panel px-4 py-3">
-            <span className="flex size-10 items-center justify-center rounded-xl bg-accent/15 text-lg font-black text-glow">
-              $
-            </span>
-            <div>
-              <p className="text-xs text-mist">Валюта оголошень</p>
-              <p className="font-bold">Долар США (USD)</p>
-            </div>
-          </div>
+          <p className="w-fit rounded-full border border-white/10 bg-panel px-4 py-2 text-sm font-semibold text-mist">
+            Ціни в USD
+          </p>
         </div>
       </section>
 
@@ -191,6 +185,8 @@ export function CatalogPage() {
               <option value="40000">До $40 000</option>
               <option value="60000">До $60 000</option>
               <option value="100000">До $100 000</option>
+              <option value="150000">До $150 000</option>
+              <option value="500000">До $500 000</option>
             </select>
           </label>
         </div>

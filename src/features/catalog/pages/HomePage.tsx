@@ -70,9 +70,10 @@ export function HomePage() {
         <img
           src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=1600&q=70"
           alt=""
-          className="absolute inset-0 h-full w-full object-cover"
+          className="absolute inset-0 h-full w-full object-cover object-[72%_center]"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-canvas via-canvas/92 to-canvas/35" />
+        <div className="absolute inset-0 bg-gradient-to-r from-canvas from-15% via-canvas/78 to-canvas/20" />
+        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-canvas to-transparent" />
 
         <Container className="relative grid items-center gap-10 py-14 lg:grid-cols-[1.15fr_0.85fr] lg:py-20">
           <div>
@@ -167,6 +168,8 @@ export function HomePage() {
                 <option value="40000">До $40 000</option>
                 <option value="60000">До $60 000</option>
                 <option value="100000">До $100 000</option>
+                <option value="150000">До $150 000</option>
+                <option value="500000">До $500 000</option>
               </select>
             </label>
             <div className="flex items-end">
@@ -236,7 +239,7 @@ export function HomePage() {
           </div>
         ) : (
           <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-            {vehicles.map((vehicle) => (
+            {vehicles.slice(0, 4).map((vehicle) => (
               <VehicleCard
                 key={vehicle.id}
                 vehicle={vehicle}

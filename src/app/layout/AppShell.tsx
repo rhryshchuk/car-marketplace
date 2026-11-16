@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Car, Menu, X } from 'lucide-react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
+import { useFavorites } from '@/features/favorites'
 import { Container } from '@/shared/ui/Container'
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
@@ -12,6 +13,8 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
 
 export function AppShell() {
   const location = useLocation()
+  const { favoriteIds } = useFavorites()
+  const savedCount = favoriteIds.length
   const here = `${location.pathname}${location.hash}`
   const [menuLocation, setMenuLocation] = useState<string | null>(null)
   const menuOpen = menuLocation === here
@@ -50,6 +53,11 @@ export function AppShell() {
             </NavLink>
             <NavLink to="/favorites" className={navLinkClass}>
               Обране
+              {savedCount > 0 ? (
+                <span className="ml-1.5 inline-flex min-w-5 items-center justify-center rounded-full bg-accent px-1.5 text-[11px] leading-5 text-white">
+                  {savedCount}
+                </span>
+              ) : null}
             </NavLink>
             <NavLink to="/contacts" className={navLinkClass}>
               Контакти
@@ -92,8 +100,13 @@ export function AppShell() {
                 <NavLink to="/catalog" onClick={closeMenu} className="rounded-control px-3 py-3 text-base font-semibold transition hover:bg-white/5">
                   Каталог
                 </NavLink>
-                <NavLink to="/favorites" onClick={closeMenu} className="rounded-control px-3 py-3 text-base font-semibold transition hover:bg-white/5">
+                <NavLink to="/favorites" onClick={closeMenu} className="flex items-center justify-between rounded-control px-3 py-3 text-base font-semibold transition hover:bg-white/5">
                   Обране
+                  {savedCount > 0 ? (
+                    <span className="inline-flex min-w-6 items-center justify-center rounded-full bg-accent px-1.5 text-xs leading-6 text-white">
+                      {savedCount}
+                    </span>
+                  ) : null}
                 </NavLink>
                 <NavLink to="/contacts" onClick={closeMenu} className="rounded-control px-3 py-3 text-base font-semibold transition hover:bg-white/5">
                   Контакти

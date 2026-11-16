@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
-import { CalendarDays, Fuel, Gauge, Heart } from 'lucide-react'
+import { Fuel, Gauge, Heart } from 'lucide-react'
 import type { Vehicle } from '@/data/vehicles'
 import { formatMileage, formatPrice } from '@/shared/lib/format'
 
@@ -78,18 +78,14 @@ export function VehicleCard({
         </p>
         <p className="mt-1 text-xs text-mist">Ціна вказана в USD</p>
 
-        <div className="mt-4 grid grid-cols-2 gap-2 border-t border-white/10 pt-4 text-sm text-mist">
-          <span className="flex items-center gap-2">
+        <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 border-t border-white/10 pt-4 text-sm text-mist">
+          <span className="inline-flex items-center gap-2">
             <Gauge size={16} className="shrink-0 text-glow" />
             {formatMileage(vehicle.mileage)}
           </span>
-          <span className="flex items-center gap-2">
+          <span className="inline-flex items-center gap-2">
             <Fuel size={16} className="shrink-0 text-glow" />
             {vehicle.fuel}
-          </span>
-          <span className="flex items-center gap-2">
-            <CalendarDays size={16} className="shrink-0 text-glow" />
-            {vehicle.year}
           </span>
         </div>
 
