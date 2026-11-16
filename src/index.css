@@ -82,12 +82,35 @@ select:focus-visible {
   animation: page-in 0.4s ease both;
 }
 
+.reveal-wait {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+.reveal-in {
+  animation: page-in 0.55s ease both;
+}
+
+.menu-panel {
+  transition: grid-template-rows 0.28s ease;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
 
-  .page-enter {
+  .page-enter,
+  .reveal-in {
     animation: none;
+  }
+
+  .reveal-wait {
+    opacity: 1;
+    transform: none;
+  }
+
+  .menu-panel {
+    transition: none;
   }
 }

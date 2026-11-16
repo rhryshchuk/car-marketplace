@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import { useFavorites } from '@/features/favorites'
 import { getVehicles, vehiclesQueryKey } from '@/services/vehicleService'
+import { useDocumentTitle } from '@/shared/lib/useDocumentTitle'
 import { Container } from '@/shared/ui/Container'
 import { VehicleCard } from '@/shared/ui/VehicleCard'
 
@@ -17,6 +18,7 @@ const selectClass =
   'h-12 w-full rounded-control border border-white/10 bg-ink px-4 text-sm text-white outline-none transition hover:border-white/20 focus-visible:border-accent focus-visible:ring-4 focus-visible:ring-accent/20'
 
 export function CatalogPage() {
+  useDocumentTitle('Каталог автомобілів — AUTO MARKET')
   const [searchParams] = useSearchParams()
 
   const [search, setSearch] = useState(searchParams.get('search') ?? '')
@@ -30,6 +32,11 @@ export function CatalogPage() {
     queryFn: getVehicles,
   })
   const vehicles = vehiclesQuery.data ?? []
+  const brands = useMemo(() => {
+    const names = new Set((vehiclesQuery.data ?? []).map((vehicle) => vehicle.brand))
+    if (brand !== 'Усі марки') names.add(brand)
+    return [...names].sort((left, right) => left.localeCompare(right, 'uk'))
+  }, [vehiclesQuery.data, brand])
 
   const filteredVehicles = useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase()
@@ -159,11 +166,9 @@ export function CatalogPage() {
             <span className="mb-2 block text-sm font-semibold">Марка автомобіля</span>
             <select value={brand} onChange={(event) => setBrand(event.target.value)} className={selectClass}>
               <option>Усі марки</option>
-              <option>BMW</option>
-              <option>Mercedes-Benz</option>
-              <option>Audi</option>
-              <option>Volkswagen</option>
-              <option>Toyota</option>
+              {brands.map((item) => (
+                <option key={item}>{item}</option>
+              ))}
             </select>
           </label>
 
@@ -192,7 +197,7 @@ export function CatalogPage() {
 
         <div className="mt-6 flex flex-col justify-between gap-4 border-t border-white/10 pt-5 sm:flex-row sm:items-center">
           <p className="text-sm text-mist">Фільтри застосовуються автоматично</p>
-          <label className="flex flex-wrap items-center gap-3 text-sm">
+          <label className="flex w-full flex-col gap-2 text-sm sm:w-auto sm:flex-row sm:items-center sm:gap-3">
             <span className="inline-flex items-center gap-2 font-semibold text-mist">
               <ArrowDownUp size={16} />
               Сортувати:
@@ -200,7 +205,7 @@ export function CatalogPage() {
             <select
               value={sort}
               onChange={(event) => setSort(event.target.value)}
-              className="h-11 min-w-[210px] rounded-control border border-white/10 bg-ink px-3 text-sm font-semibold text-white outline-none focus-visible:border-accent"
+              className="h-12 w-full rounded-control border border-white/10 bg-ink px-3 text-sm font-semibold text-white outline-none focus-visible:border-accent sm:h-11 sm:w-auto sm:min-w-52"
             >
               <option value="newest">Спочатку новіші</option>
               <option value="oldest">Спочатку старіші</option>
@@ -268,7 +273,7 @@ export function CatalogPage() {
                 action={
                   <Link
                     to={`/catalog/${vehicle.id}`}
-                    className="inline-flex h-11 items-center gap-2 rounded-control bg-accent/15 px-4 text-sm font-bold text-glow transition hover:bg-accent hover:text-white"
+                    className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-control bg-accent/15 px-4 text-sm font-bold text-glow transition hover:bg-accent hover:text-white"
                   >
                     Детальніше
                     <ArrowRight size={16} />

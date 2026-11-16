@@ -2,6 +2,7 @@ import { useSearchParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { InquiryForm } from '@/features/contacts/components/InquiryForm'
 import { getVehicleById, vehicleQueryKey } from '@/services/vehicleService'
+import { useDocumentTitle } from '@/shared/lib/useDocumentTitle'
 import { Container } from '@/shared/ui/Container'
 
 const contactPlaceholders = [
@@ -11,6 +12,7 @@ const contactPlaceholders = [
 ]
 
 export function ContactsPage() {
+  useDocumentTitle('Контакти — AUTO MARKET')
   const [searchParams] = useSearchParams()
   const vehicleId = searchParams.get('vehicleId')
   const id = Number(vehicleId)

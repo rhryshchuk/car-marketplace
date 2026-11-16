@@ -4,8 +4,10 @@ import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { Container } from '@/shared/ui/Container'
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
-  `text-sm font-semibold transition focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-glow ${
-    isActive ? 'text-white' : 'text-mist hover:text-white'
+  `relative text-sm font-semibold transition duration-200 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-glow ${
+    isActive
+      ? 'text-white after:absolute after:-bottom-2 after:left-0 after:h-0.5 after:w-full after:rounded-full after:bg-accent'
+      : 'text-mist hover:text-white'
   }`
 
 export function AppShell() {
@@ -66,7 +68,7 @@ export function AppShell() {
             </Link>
             <button
               type="button"
-              className="inline-flex size-11 items-center justify-center rounded-control border border-white/15 text-white lg:hidden"
+              className="inline-flex size-11 items-center justify-center rounded-control border border-white/15 text-white transition hover:border-white/30 hover:bg-white/5 lg:hidden"
               aria-expanded={menuOpen}
               aria-controls="mobile-nav"
               onClick={() => setMenuLocation(menuOpen ? null : here)}
@@ -77,27 +79,32 @@ export function AppShell() {
           </div>
         </Container>
 
-        {menuOpen ? (
-          <nav id="mobile-nav" className="border-t border-white/10 bg-ink lg:hidden" aria-label="Мобільне">
-            <Container className="flex flex-col gap-1 py-3">
-              <NavLink to="/" end onClick={closeMenu} className="rounded-control px-3 py-3 text-base font-semibold hover:bg-white/5">
-                Головна
-              </NavLink>
-              <NavLink to="/catalog" onClick={closeMenu} className="rounded-control px-3 py-3 text-base font-semibold hover:bg-white/5">
-                Каталог
-              </NavLink>
-              <NavLink to="/favorites" onClick={closeMenu} className="rounded-control px-3 py-3 text-base font-semibold hover:bg-white/5">
-                Обране
-              </NavLink>
-              <NavLink to="/contacts" onClick={closeMenu} className="rounded-control px-3 py-3 text-base font-semibold hover:bg-white/5">
-                Контакти
-              </NavLink>
-              <NavLink to="/about" onClick={closeMenu} className="rounded-control px-3 py-3 text-base font-semibold hover:bg-white/5">
-                Про компанію
-              </NavLink>
-            </Container>
-          </nav>
-        ) : null}
+        <div
+          id="mobile-nav"
+          className={`menu-panel grid lg:hidden ${menuOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}
+        >
+          <div className="overflow-hidden">
+            <nav className="border-t border-white/10 bg-ink" aria-label="Мобільне" inert={!menuOpen}>
+              <Container className="flex flex-col gap-1 py-3">
+                <NavLink to="/" end onClick={closeMenu} className="rounded-control px-3 py-3 text-base font-semibold transition hover:bg-white/5">
+                  Головна
+                </NavLink>
+                <NavLink to="/catalog" onClick={closeMenu} className="rounded-control px-3 py-3 text-base font-semibold transition hover:bg-white/5">
+                  Каталог
+                </NavLink>
+                <NavLink to="/favorites" onClick={closeMenu} className="rounded-control px-3 py-3 text-base font-semibold transition hover:bg-white/5">
+                  Обране
+                </NavLink>
+                <NavLink to="/contacts" onClick={closeMenu} className="rounded-control px-3 py-3 text-base font-semibold transition hover:bg-white/5">
+                  Контакти
+                </NavLink>
+                <NavLink to="/about" onClick={closeMenu} className="rounded-control px-3 py-3 text-base font-semibold transition hover:bg-white/5">
+                  Про компанію
+                </NavLink>
+              </Container>
+            </nav>
+          </div>
+        </div>
       </header>
 
       <main id="content" key={location.pathname} className="page-enter flex-1">
@@ -105,33 +112,37 @@ export function AppShell() {
       </main>
 
       <footer className="border-t border-white/10 bg-ink">
-        <Container className="flex flex-col gap-8 py-10 md:flex-row md:items-start md:justify-between">
-          <div>
-            <Link to="/" className="text-lg font-extrabold tracking-tight">
-              AUTO <span className="text-glow">MARKET</span>
-            </Link>
-            <p className="mt-2 max-w-xs text-sm leading-6 text-mist">
-              Знайди автомобіль, який підходить саме тобі. Твій наступний автомобіль починається тут.
-            </p>
+        <Container className="py-12">
+          <div className="grid gap-8 md:grid-cols-[1.4fr_1fr] md:items-start">
+            <div>
+              <Link to="/" className="text-lg font-extrabold tracking-tight">
+                AUTO <span className="text-glow">MARKET</span>
+              </Link>
+              <p className="mt-3 max-w-sm text-sm leading-6 text-mist">
+                Автомобілі зі США в каталозі компанії. Ціни в USD, пробіг у кілометрах.
+              </p>
+            </div>
+            <nav className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm font-semibold text-mist" aria-label="Нижнє меню">
+              <Link to="/" className="transition hover:text-white">
+                Головна
+              </Link>
+              <Link to="/catalog" className="transition hover:text-white">
+                Каталог
+              </Link>
+              <Link to="/favorites" className="transition hover:text-white">
+                Обране
+              </Link>
+              <Link to="/contacts" className="transition hover:text-white">
+                Контакти
+              </Link>
+              <Link to="/about" className="transition hover:text-white">
+                Про компанію
+              </Link>
+            </nav>
           </div>
-          <nav className="flex flex-wrap gap-x-6 gap-y-3 text-sm font-semibold text-mist" aria-label="Нижнє меню">
-            <Link to="/" className="hover:text-white">
-              Головна
-            </Link>
-            <Link to="/catalog" className="hover:text-white">
-              Каталог
-            </Link>
-            <Link to="/favorites" className="hover:text-white">
-              Обране
-            </Link>
-            <Link to="/contacts" className="hover:text-white">
-              Контакти
-            </Link>
-            <Link to="/about" className="hover:text-white">
-              Про компанію
-            </Link>
-          </nav>
-          <p className="text-sm text-mist">© {new Date().getFullYear()} AUTO MARKET. Усі права захищені.</p>
+          <p className="mt-8 border-t border-white/10 pt-6 text-sm text-mist">
+            © {new Date().getFullYear()} AUTO MARKET. Усі права захищені.
+          </p>
         </Container>
       </footer>
     </div>

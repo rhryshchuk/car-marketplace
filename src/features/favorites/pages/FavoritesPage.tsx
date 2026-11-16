@@ -4,10 +4,12 @@ import { ArrowRight, Heart } from 'lucide-react'
 import { favoriteVehicles } from '@/features/favorites/model/favorites'
 import { useFavorites } from '@/features/favorites/hooks/useFavorites'
 import { getVehicles, vehiclesQueryKey } from '@/services/vehicleService'
+import { useDocumentTitle } from '@/shared/lib/useDocumentTitle'
 import { Container } from '@/shared/ui/Container'
 import { VehicleCard } from '@/shared/ui/VehicleCard'
 
 export function FavoritesPage() {
+  useDocumentTitle('Обране — AUTO MARKET')
   const { favoriteIds, isFavorite, toggleFavorite } = useFavorites()
   const vehiclesQuery = useQuery({
     queryKey: vehiclesQueryKey,
@@ -60,7 +62,7 @@ export function FavoritesPage() {
                 <button
                   type="button"
                   onClick={() => toggleFavorite(vehicle.id)}
-                  className="inline-flex h-11 items-center gap-2 rounded-control bg-accent/15 px-4 text-sm font-bold text-glow transition hover:bg-accent hover:text-white"
+                  className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-control bg-accent/15 px-4 text-sm font-bold text-glow transition hover:bg-accent hover:text-white"
                 >
                   Прибрати з обраного
                   <ArrowRight size={16} />

@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useMemo, useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { ArrowRight, CarFront, Search, ShieldCheck, SlidersHorizontal } from 'lucide-react'
@@ -6,7 +6,9 @@ import { useFavorites } from '@/features/favorites'
 import { getVehicles, vehiclesQueryKey } from '@/services/vehicleService'
 import { VehicleCard } from '@/shared/ui/VehicleCard'
 import { formatPrice } from '@/shared/lib/format'
+import { useDocumentTitle } from '@/shared/lib/useDocumentTitle'
 import { Container } from '@/shared/ui/Container'
+import { Reveal } from '@/shared/ui/Reveal'
 
 const fieldClass =
   'h-12 w-full rounded-control border border-white/10 bg-ink px-4 text-sm text-white outline-none transition focus-visible:border-accent focus-visible:ring-4 focus-visible:ring-accent/20'
@@ -30,6 +32,7 @@ const benefits = [
 ]
 
 export function HomePage() {
+  useDocumentTitle('AUTO MARKET — автомобілі зі США')
   const navigate = useNavigate()
   const { isFavorite, toggleFavorite } = useFavorites()
   const [brand, setBrand] = useState('')
@@ -42,7 +45,11 @@ export function HomePage() {
   const vehicles = vehiclesQuery.data ?? []
 
   const spotlight = vehicles[0]
-  const brands = [...new Set(vehicles.map((vehicle) => vehicle.brand))]
+  const brands = useMemo(() => {
+    const names = new Set((vehiclesQuery.data ?? []).map((vehicle) => vehicle.brand))
+    if (brand) names.add(brand)
+    return [...names].sort((left, right) => left.localeCompare(right, 'uk'))
+  }, [vehiclesQuery.data, brand])
   const lowestPrice = vehicles.length > 0 ? Math.min(...vehicles.map((vehicle) => vehicle.price)) : null
 
   const handleSearch = (event: FormEvent<HTMLFormElement>) => {
@@ -61,7 +68,7 @@ export function HomePage() {
     <div>
       <section className="relative overflow-hidden">
         <img
-          src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=2000&q=80"
+          src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=1600&q=70"
           alt=""
           className="absolute inset-0 h-full w-full object-cover"
         />
@@ -135,11 +142,11 @@ export function HomePage() {
               <span className="mb-2 block text-sm font-semibold">Марка автомобіля</span>
               <select value={brand} onChange={(event) => setBrand(event.target.value)} className={fieldClass}>
                 <option value="">Усі марки</option>
-                <option value="BMW">BMW</option>
-                <option value="Mercedes-Benz">Mercedes-Benz</option>
-                <option value="Audi">Audi</option>
-                <option value="Volkswagen">Volkswagen</option>
-                <option value="Toyota">Toyota</option>
+                {brands.map((item) => (
+                  <option key={item} value={item}>
+                    {item}
+                  </option>
+                ))}
               </select>
             </label>
             <label className="block">
@@ -176,11 +183,11 @@ export function HomePage() {
       </Container>
 
       <Container className="py-14">
-        <div className="grid gap-4 md:grid-cols-3">
+        <Reveal className="grid gap-4 md:grid-cols-3">
           {benefits.map((item) => {
             const Icon = item.icon
             return (
-              <div key={item.title} className="rounded-card border border-white/10 bg-panel p-6">
+              <div key={item.title} className="rounded-card border border-white/10 bg-panel p-6 transition duration-300 hover:-translate-y-1 hover:border-accent/40 motion-reduce:transform-none">
                 <span className="flex size-11 items-center justify-center rounded-xl bg-accent/15 text-glow">
                   <Icon size={20} />
                 </span>
@@ -189,7 +196,7 @@ export function HomePage() {
               </div>
             )
           })}
-        </div>
+        </Reveal>
       </Container>
 
       <Container className="pb-16">
@@ -269,7 +276,7 @@ export function HomePage() {
                 <ArrowRight size={18} />
               </Link>
             </div>
-            <div className="grid grid-cols-3 border-t border-white/10 lg:border-t-0 lg:border-l">
+            <div className="grid grid-cols-1 border-t border-white/10 sm:grid-cols-3 lg:border-t-0 lg:border-l">
               <Stat
                 value={vehiclesQuery.isSuccess ? String(vehicles.length) : '…'}
                 label="авто в каталозі"
@@ -316,8 +323,8 @@ export function HomePage() {
 
 function Stat({ value, label }: { value: string; label: string }) {
   return (
-    <div className="flex flex-col justify-center px-3 py-6 text-center sm:px-4">
-      <p className="text-xl font-extrabold tracking-tight text-white sm:text-2xl">{value}</p>
+    <div className="flex min-w-0 flex-col justify-center border-t border-white/10 px-4 py-5 text-center first:border-t-0 sm:border-t-0 sm:border-l sm:first:border-l-0">
+      <p className="text-balance break-words text-lg font-extrabold tracking-tight text-white sm:text-2xl">{value}</p>
       <p className="mt-1 text-xs leading-5 text-mist">{label}</p>
     </div>
   )

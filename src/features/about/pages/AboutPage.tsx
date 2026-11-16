@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { ArrowRight, CarFront, MessageSquare, Search, ShieldCheck } from 'lucide-react'
+import { useDocumentTitle } from '@/shared/lib/useDocumentTitle'
 import { Container } from '@/shared/ui/Container'
 
 const advantages = [
@@ -16,7 +17,7 @@ const advantages = [
   {
     icon: MessageSquare,
     title: 'Заявка на сайті',
-    text: 'Питання щодо конкретного авто можна залишити у формі. Зараз форма демонстраційна.',
+    text: 'Питання щодо конкретного авто можна залишити у формі. Заявка зберігається для адміністратора компанії.',
   },
   {
     icon: Search,
@@ -45,11 +46,13 @@ const steps = [
 ]
 
 export function AboutPage() {
+  useDocumentTitle('Про компанію — AUTO MARKET')
+
   return (
     <div>
       <section className="relative overflow-hidden">
         <img
-          src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=2000&q=80"
+          src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=1600&q=70"
           alt="Автомобіль на дорозі"
           className="absolute inset-0 h-full w-full object-cover"
         />
@@ -92,8 +95,8 @@ export function AboutPage() {
             </p>
           </div>
           <img
-            src="https://images.unsplash.com/photo-1555215695-3004980ad54e?w=1200"
-            alt="BMW 5 Series з каталогу"
+            src="https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=1200&q=70"
+            alt="Автомобіль"
             className="aspect-[16/11] w-full rounded-card border border-white/10 object-cover"
           />
         </div>
@@ -111,7 +114,7 @@ export function AboutPage() {
               return (
                 <article
                   key={item.title}
-                  className="rounded-card border border-white/10 bg-panel p-6 transition duration-300 hover:-translate-y-1 hover:border-accent/40"
+                  className="rounded-card border border-white/10 bg-panel p-6 transition duration-300 hover:-translate-y-1 hover:border-accent/40 motion-reduce:transform-none"
                 >
                   <span className="flex size-11 items-center justify-center rounded-xl bg-accent/15 text-glow">
                     <Icon size={20} />
@@ -146,7 +149,7 @@ export function AboutPage() {
             Подивіться авто або напишіть нам
           </h2>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-mist">
-            Каталог показує машини, які є зараз. У контактах можна залишити демонстраційну заявку.
+            Каталог показує машини, які є зараз. У контактах можна залишити заявку щодо обраного авто.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Link
